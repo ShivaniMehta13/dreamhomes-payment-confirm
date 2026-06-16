@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 import requests
 import os
 
@@ -7,6 +8,13 @@ app = FastAPI()
 
 LANGFLOW_WEBHOOK = "https://agent-builder.nhtech.link/api/v1/webhook/fcf98cc6-6a0d-4ea4-b18d-7bcf6a100dd1"
 WEBHOOK_KEY = os.getenv("WEBHOOK_KEY", "sk-cQzPJUpymdgI4FDsoiGPkboMUoIE3K3pryUt5xa7zyc")
+
+@app.get("/")
+def home():
+    return {
+        "status": "running",
+        "message": "DreamHomes API Working"
+    }
 
 @app.get("/payment-done", response_class=HTMLResponse)
 def payment_done(installment_id: str):
@@ -70,3 +78,16 @@ def approve_booking(client_name: str, client_email: str, submission_id: str = ""
       </div>
     </body></html>
     """
+
+
+@app.get("/booking-form.html")
+def booking():
+    return FileResponse("booking-form.html")
+
+@app.get("/welcome-docs.html")
+def welcome():
+    return FileResponse("welcome-docs.html")
+
+@app.get("/agreement-to-sell.html")
+def agreement():
+    return FileResponse("agreement-to-sell.html")
