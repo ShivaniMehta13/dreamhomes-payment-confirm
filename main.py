@@ -55,13 +55,23 @@ def payment_done(installment_id: str):
 
 @app.get("/approve-booking", response_class=HTMLResponse)
 def approve_booking(client_name: str, client_email: str, submission_id: str = ""):
-    APPROVAL_WEBHOOK = "https://agent-builder.nhtech.link/api/v1/webhook/fcf98cc6-6a0d-4ea4-b18d-7bcf6a100dd1"
+    
+    # ← YAHAN Agent 2 ka webhook URL daalo
+    APPROVAL_WEBHOOK = "https://agent-builder.nhtech.link/api/v1/webhook/78b52af3-f506-49cd-9d5e-cfb34742a7e7"
     WEBHOOK_KEY = os.getenv("WEBHOOK_KEY", "sk-cQzPJUpymdgI4FDsoiGPkboMUoIE3K3pryUt5xa7zyc")
 
     requests.post(
         APPROVAL_WEBHOOK,
-        headers={"Content-Type": "application/json", "x-api-key": WEBHOOK_KEY},
-        json={"client_name": client_name, "client_email": client_email, "submission_id": submission_id},
+        headers={
+            "Content-Type": "application/json",
+            "x-api-key": WEBHOOK_KEY
+        },
+        # ← YAHAN client_name, email, id bhejo
+        json={
+            "client_name": client_name,
+            "client_email": client_email,
+            "submission_id": submission_id
+        },
         timeout=30
     )
 
