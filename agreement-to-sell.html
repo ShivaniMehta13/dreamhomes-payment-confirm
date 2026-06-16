@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Agreement to Sell - DreamHomes</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: 'Times New Roman', serif; padding: 40px; background: #f9fafb; }
+    .doc { max-width: 800px; margin: auto; background: white; padding: 60px; border: 1px solid #d1d5db; }
+    .header { text-align: center; margin-bottom: 40px; }
+    .header h1 { font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+    .header h2 { font-size: 16px; margin-top: 8px; color: #374151; }
+    .underline { border-bottom: 2px solid #111; display: inline-block; }
+    .clause { margin-bottom: 20px; }
+    .clause-num { font-weight: 700; }
+    p { font-size: 14px; line-height: 1.9; color: #1f2937; text-align: justify; }
+    .parties { background: #f9fafb; border: 1px solid #e5e7eb; padding: 20px; margin: 24px 0; border-radius: 4px; }
+    .sign-section { display: flex; justify-content: space-between; margin-top: 80px; }
+    .sign-box { text-align: center; width: 200px; }
+    .sign-line { border-top: 1px solid #374151; margin-top: 50px; padding-top: 8px; font-size: 12px; }
+    .template-a { border-top: 4px solid #1e40af; }
+    .template-b { border-top: 4px solid #16a34a; }
+  </style>
+</head>
+<body>
+<div class="doc" id="doc">
+  <div style="text-align:center;padding:100px;color:#6b7280;">⏳ Loading...</div>
+</div>
+
+<script>
+const p = new URLSearchParams(window.location.search);
+const get = (k) => decodeURIComponent(p.get(k) || '');
+const isEast = get('block_number') === 'East';
+const isJoint = get('applicant_type') === 'Joint';
+const today = new Date().toLocaleDateString('en-IN', {day:'numeric', month:'long', year:'numeric'});
+
+document.getElementById('doc').className = `doc ${isEast ? 'template-a' : 'template-b'}`;
+
+document.getElementById('doc').innerHTML = `
+<div class="header">
+  <h1>Agreement to Sell</h1>
+  <h2>DreamHomes Real Estate</h2>
+  <p style="font-size:12px;margin-top:8px;color:#6b7280;">
+    Template ${isEast ? 'A (East Block)' : 'B (North/South/West Block)'} | 
+    Date: ${today} | Ref: ATS-${get('lead_id')}
+  </p>
+</div>
+
+<div class="parties">
+  <p><strong>BETWEEN:</strong></p>
+  <p style="margin-top:8px;"><strong>SELLER:</strong> DreamHomes Real Estate Private Limited, having its registered office at Bangalore, Karnataka (hereinafter referred to as the "Developer")</p>
+  <br>
+  <p><strong>AND</strong></p>
+  <br>
+  <p><strong>BUYER${isJoint ? 'S' : ''}:</strong></p>
+  <p>1. <strong>${get('client_name')}</strong>, residing at ${get('address')}, Contact: ${get('phone')}</p>
+  ${isJoint ? `<p>2. <strong>${get('co_applicant_name')}</strong> (Co-Applicant)</p>` : ''}
+  <p style="margin-top:8px;">(hereinafter referred to as the "Purchaser${isJoint ? 's' : ''}")</p>
+</div>
+
+<div class="clause">
+  <p><span class="clause-num">1. PROPERTY DETAILS:</span> The Developer agrees to sell and the Purchaser${isJoint ? 's' : ''} agree${isJoint ? '' : 's'} to purchase the residential unit bearing <strong>Flat No. ${get('flat_number')}, Block ${get('block_number')}</strong>, being a <strong>${get('property_type')}</strong> apartment with Super Built-up Area of <strong>${get('sba')} Sq. Ft.</strong>, RERA Registration No. <strong>${get('rera_number')}</strong>.</p>
+</div>
+
+<div class="clause">
+  <p><span class="clause-num">2. SALE CONSIDERATION:</span> The total sale consideration for the said unit is <strong>₹${get('total_cost')} (${get('total_cost_words')})</strong>, which includes construction cost of <strong>₹${get('construction_cost')} (${get('construction_cost_words')})</strong> and UDS cost of <strong>₹${get('uds_cost')}</strong>.</p>
+</div>
+
+<div class="clause">
+  <p><span class="clause-num">3. PAYMENT SCHEDULE:</span> The Purchaser${isJoint ? 's' : ''} shall pay the total consideration as follows:</p>
+  <p style="margin-top:8px;">a) Booking Amount: <strong>₹${get('booking_amount')} (${get('booking_amount_words')})</strong> paid on the date of this agreement</p>
+  <p>b) Down Payment: <strong>₹${get('down_payment')} (${get('down_payment_words')})</strong></p>
+  <p>c) Balance via EMI: <strong>₹${get('emi_amount')} (${get('emi_amount_words')})</strong> per month for <strong>${get('emi_duration')} months</strong></p>
+  <p>d) Payment Mode: <strong>${get('payment_method')}</strong></p>
+</div>
+
+<div class="clause">
+  <p><span class="clause-num">4. CAR PARKING:</span> ${get('car_parking') === 'Yes' ? `The Purchaser${isJoint ? 's' : ''} shall be entitled to one covered car parking slot No. <strong>${get('parking_slot')}</strong> at an additional cost as mutually agreed.` : 'Car parking is not included in this agreement.'}</p>
+</div>
+
+${isEast ? `
+<div class="clause">
+  <p><span class="clause-num">5. EAST BLOCK SPECIAL CLAUSE (TEMPLATE A):</span> This unit being in the East Block carries special east-facing premium and shall be governed by the East Block maintenance guidelines and specific RERA East Block registration terms as per RERA No. ${get('rera_number')}.</p>
+</div>` : `
+<div class="clause">
+  <p><span class="clause-num">5. ${get('block_number').toUpperCase()} BLOCK CLAUSE (TEMPLATE B):</span> This unit being in the ${get('block_number')} Block shall be governed by the standard block maintenance guidelines and RERA registration terms as per RERA No. ${get('rera_number')}.</p>
+</div>`}
+
+${isJoint ? `
+<div class="clause">
+  <p><span class="clause-num">6. JOINT OWNERSHIP CLAUSE:</span> Both Purchasers, namely <strong>${get('client_name')}</strong> and <strong>${get('co_applicant_name')}</strong>, shall jointly and severally be responsible for all payments and obligations under this Agreement. The property shall be held jointly with equal rights unless otherwise specified.</p>
+</div>` : ''}
+
+<div class="clause">
+  <p><span class="clause-num">${isJoint ? '7' : '6'}. GOVERNING LAW:</span> This Agreement shall be governed by the laws of India and subject to the jurisdiction of courts in Bangalore, Karnataka.</p>
+</div>
+
+<div class="sign-section">
+  <div class="sign-box">
+    <div class="sign-line">Authorized Signatory<br>DreamHomes Real Estate</div>
+  </div>
+  <div class="sign-box">
+    <div class="sign-line">${get('client_name')}<br>Purchaser</div>
+  </div>
+  ${isJoint ? `
+  <div class="sign-box">
+    <div class="sign-line">${get('co_applicant_name')}<br>Co-Purchaser</div>
+  </div>` : ''}
+</div>
+
+<p style="text-align:center;font-size:11px;color:#9ca3af;margin-top:40px;">
+  This is a computer-generated document. | DreamHomes Real Estate Pvt. Ltd. | ${today}
+</p>
+`;
+</script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Booking Form - DreamHomes</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: Arial, sans-serif; padding: 40px; background: #f9fafb; }
+    .doc { max-width: 800px; margin: auto; background: white; padding: 48px; border: 1px solid #e5e7eb; }
+    .header { text-align: center; border-bottom: 3px solid #1e40af; padding-bottom: 20px; margin-bottom: 32px; }
+    .header h1 { font-size: 28px; color: #1e40af; }
+    .header p { color: #6b7280; margin-top: 4px; }
+    .section { margin-bottom: 28px; }
+    .section h2 { font-size: 14px; font-weight: 700; color: #1e40af; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; margin-bottom: 16px; }
+    .row { display: flex; margin-bottom: 12px; }
+    .label { width: 220px; font-size: 13px; color: #6b7280; flex-shrink: 0; }
+    .value { font-size: 13px; color: #111827; font-weight: 500; border-bottom: 1px solid #d1d5db; flex: 1; padding-bottom: 2px; min-height: 20px; }
+    .sign-section { display: flex; justify-content: space-between; margin-top: 60px; }
+    .sign-box { text-align: center; width: 200px; }
+    .sign-line { border-top: 1px solid #374151; margin-top: 40px; padding-top: 8px; font-size: 12px; color: #6b7280; }
+    .stamp { width: 80px; height: 80px; border: 2px dashed #d1d5db; border-radius: 50%; margin: 20px auto; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 11px; }
+    .loading { text-align: center; padding: 100px; color: #6b7280; font-size: 18px; }
+  </style>
+</head>
+<body>
+<div class="doc" id="doc">
+  <div class="loading">⏳ Loading document...</div>
+</div>
+
+<script>
+const p = new URLSearchParams(window.location.search);
+const get = (k) => decodeURIComponent(p.get(k) || '');
+
+document.getElementById('doc').innerHTML = `
+<div class="header">
+  <h1>🏠 DreamHomes Real Estate</h1>
+  <p>BOOKING FORM</p>
+  <p style="font-size:12px;margin-top:8px;color:#9ca3af;">Ref: BF-${get('lead_id') || 'XXXX'} | Date: ${new Date().toLocaleDateString('en-IN')}</p>
+</div>
+
+<div class="section">
+  <h2>Applicant Details</h2>
+  <div class="row"><span class="label">Primary Applicant Name</span><span class="value">${get('client_name')}</span></div>
+  <div class="row"><span class="label">Applicant Type</span><span class="value">${get('applicant_type')}</span></div>
+  ${get('applicant_type') === 'Joint' ? `<div class="row"><span class="label">Co-Applicant Name</span><span class="value">${get('co_applicant_name')}</span></div>` : ''}
+  <div class="row"><span class="label">Email Address</span><span class="value">${get('client_email')}</span></div>
+  <div class="row"><span class="label">Phone Number</span><span class="value">${get('phone')}</span></div>
+  <div class="row"><span class="label">Address</span><span class="value">${get('address')}</span></div>
+</div>
+
+<div class="section">
+  <h2>Unit Details</h2>
+  <div class="row"><span class="label">Block Number</span><span class="value">${get('block_number')}</span></div>
+  <div class="row"><span class="label">Flat Number</span><span class="value">${get('flat_number')}</span></div>
+  <div class="row"><span class="label">Property Type</span><span class="value">${get('property_type')}</span></div>
+  <div class="row"><span class="label">SBA (Sq. Ft.)</span><span class="value">${get('sba')}</span></div>
+  <div class="row"><span class="label">RERA Number</span><span class="value">${get('rera_number')}</span></div>
+  <div class="row"><span class="label">UDS Cost</span><span class="value">₹${get('uds_cost')}</span></div>
+</div>
+
+<div class="section">
+  <h2>Financial Details</h2>
+  <div class="row"><span class="label">Total Cost</span><span class="value">₹${get('total_cost')} (${get('total_cost_words')})</span></div>
+  <div class="row"><span class="label">Construction Cost</span><span class="value">₹${get('construction_cost')} (${get('construction_cost_words')})</span></div>
+  <div class="row"><span class="label">Booking Amount</span><span class="value">₹${get('booking_amount')} (${get('booking_amount_words')})</span></div>
+  <div class="row"><span class="label">Down Payment</span><span class="value">₹${get('down_payment')} (${get('down_payment_words')})</span></div>
+  <div class="row"><span class="label">EMI Amount</span><span class="value">₹${get('emi_amount')} (${get('emi_amount_words')})</span></div>
+  <div class="row"><span class="label">EMI Duration</span><span class="value">${get('emi_duration')} Months</span></div>
+  <div class="row"><span class="label">Payment Method</span><span class="value">${get('payment_method')}</span></div>
+</div>
+
+<div class="section">
+  <h2>Additional Details</h2>
+  <div class="row"><span class="label">Car Parking</span><span class="value">${get('car_parking')}</span></div>
+  ${get('car_parking') === 'Yes' ? `<div class="row"><span class="label">Parking Slot</span><span class="value">${get('parking_slot')}</span></div>` : ''}
+  <div class="row"><span class="label">Lead ID</span><span class="value">${get('lead_id')}</span></div>
+</div>
+
+<div class="sign-section">
+  <div class="sign-box">
+    <div class="stamp">Company<br>Stamp</div>
+    <div class="sign-line">Authorized Signatory<br>DreamHomes Real Estate</div>
+  </div>
+  <div class="sign-box">
+    <div class="sign-line">Signature of Applicant<br>${get('client_name')}</div>
+  </div>
+  ${get('applicant_type') === 'Joint' ? `
+  <div class="sign-box">
+    <div class="sign-line">Signature of Co-Applicant<br>${get('co_applicant_name')}</div>
+  </div>` : ''}
+</div>
+`;
+</script>
+</body>
+</html>

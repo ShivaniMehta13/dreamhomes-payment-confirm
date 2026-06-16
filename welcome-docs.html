@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome Documents - DreamHomes</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: Arial, sans-serif; background: #f9fafb; }
+    .doc { max-width: 800px; margin: auto; background: white; padding: 48px; border: 1px solid #e5e7eb; }
+    .header { text-align: center; background: #1e40af; color: white; padding: 32px; margin: -48px -48px 40px; }
+    .header h1 { font-size: 28px; }
+    .section { margin-bottom: 36px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+    .section-header { background: #eff6ff; padding: 14px 20px; font-weight: 700; color: #1e40af; font-size: 15px; }
+    .section-body { padding: 20px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #1e40af; color: white; padding: 10px; font-size: 13px; text-align: left; }
+    td { padding: 10px; font-size: 13px; border-bottom: 1px solid #f3f4f6; }
+    tr:nth-child(even) td { background: #f9fafb; }
+    .welcome-text { font-size: 14px; line-height: 1.8; color: #374151; }
+    .highlight { background: #eff6ff; border-left: 4px solid #1e40af; padding: 16px; margin: 16px 0; border-radius: 4px; }
+  </style>
+</head>
+<body>
+<div class="doc" id="doc">
+  <div style="text-align:center;padding:100px;color:#6b7280;">⏳ Loading...</div>
+</div>
+
+<script>
+const p = new URLSearchParams(window.location.search);
+const get = (k) => decodeURIComponent(p.get(k) || '');
+const emi = parseFloat(get('emi_amount')) || 0;
+const dur = parseInt(get('emi_duration')) || 0;
+
+// Payment schedule generate karo
+let scheduleRows = '';
+const today = new Date();
+for(let i = 1; i <= Math.min(dur, 12); i++) {
+  const d = new Date(today);
+  d.setMonth(d.getMonth() + i);
+  scheduleRows += `<tr><td>${i}</td><td>${d.toLocaleDateString('en-IN', {month:'long', year:'numeric'})}</td><td>₹${emi.toLocaleString('en-IN')}</td><td>EMI Payment</td></tr>`;
+}
+
+document.getElementById('doc').innerHTML = `
+<div class="header">
+  <h1>🏠 DreamHomes Real Estate</h1>
+  <p style="margin-top:8px;opacity:0.85;">Welcome Documents Package</p>
+  <p style="font-size:12px;margin-top:4px;opacity:0.7;">Date: ${new Date().toLocaleDateString('en-IN')}</p>
+</div>
+
+<!-- Welcome Note -->
+<div class="section">
+  <div class="section-header">📋 Welcome Note</div>
+  <div class="section-body">
+    <p class="welcome-text">Dear <strong>${get('client_name')}${get('applicant_type') === 'Joint' ? ' & ' + get('co_applicant_name') : ''}</strong>,</p>
+    <br>
+    <p class="welcome-text">We are delighted to welcome you to the <strong>DreamHomes</strong> family! Thank you for choosing us for your dream home.</p>
+    <br>
+    <div class="highlight">
+      <strong>Your Unit:</strong> Block ${get('block_number')}, Flat ${get('flat_number')} | ${get('property_type')}<br>
+      <strong>Total Value:</strong> ₹${get('total_cost')} (${get('total_cost_words')})
+    </div>
+    <p class="welcome-text">We assure you of the highest quality construction and timely delivery. Our team is always available to assist you.</p>
+  </div>
+</div>
+
+<!-- Booking Confirmation -->
+<div class="section">
+  <div class="section-header">✅ Booking Confirmation</div>
+  <div class="section-body">
+    <table>
+      <tr><th>Field</th><th>Details</th></tr>
+      <tr><td>Client Name</td><td><strong>${get('client_name')}</strong></td></tr>
+      ${get('applicant_type') === 'Joint' ? `<tr><td>Co-Applicant</td><td><strong>${get('co_applicant_name')}</strong></td></tr>` : ''}
+      <tr><td>Block & Flat</td><td>Block ${get('block_number')}, Flat ${get('flat_number')}</td></tr>
+      <tr><td>Property Type</td><td>${get('property_type')}</td></tr>
+      <tr><td>SBA</td><td>${get('sba')} Sq. Ft.</td></tr>
+      <tr><td>RERA Number</td><td>${get('rera_number')}</td></tr>
+      <tr><td>Booking Amount</td><td>₹${get('booking_amount')} (${get('booking_amount_words')})</td></tr>
+      <tr><td>Payment Method</td><td>${get('payment_method')}</td></tr>
+      <tr><td>Car Parking</td><td>${get('car_parking')}${get('parking_slot') ? ' - Slot ' + get('parking_slot') : ''}</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- Payment Schedule -->
+<div class="section">
+  <div class="section-header">📅 Payment Schedule</div>
+  <div class="section-body">
+    <div class="highlight">
+      EMI: ₹${emi.toLocaleString('en-IN')} × ${dur} months = ₹${(emi * dur).toLocaleString('en-IN')}
+    </div>
+    <table>
+      <tr><th>#</th><th>Month</th><th>Amount</th><th>Remarks</th></tr>
+      ${scheduleRows}
+      ${dur > 12 ? `<tr><td colspan="4" style="text-align:center;color:#6b7280;">... ${dur - 12} more installments</td></tr>` : ''}
+    </table>
+  </div>
+</div>
+
+<!-- Tribe Charter -->
+<div class="section">
+  <div class="section-header">📜 Tribe Charter</div>
+  <div class="section-body">
+    <p class="welcome-text">As a valued member of the DreamHomes community, we uphold the following commitments:</p>
+    <br>
+    <p class="welcome-text">✅ <strong>Quality:</strong> Premium construction materials and finishes</p>
+    <p class="welcome-text">✅ <strong>Transparency:</strong> Clear communication at every stage</p>
+    <p class="welcome-text">✅ <strong>Timely Delivery:</strong> Committed project timelines</p>
+    <p class="welcome-text">✅ <strong>After-Sales Support:</strong> Dedicated relationship manager</p>
+    <p class="welcome-text">✅ <strong>RERA Compliance:</strong> Fully registered and compliant project</p>
+  </div>
+</div>
+`;
+</script>
+</body>
+</html>
