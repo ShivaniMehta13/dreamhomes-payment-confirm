@@ -44,3 +44,29 @@ def payment_done(installment_id: str):
     </body>
     </html>
     """
+
+@app.get("/approve-booking", response_class=HTMLResponse)
+def approve_booking(client_name: str, client_email: str, submission_id: str = ""):
+    APPROVAL_WEBHOOK = "https://agent-builder.nhtech.link/api/v1/webhook/fcf98cc6-6a0d-4ea4-b18d-7bcf6a100dd1"
+    WEBHOOK_KEY = os.getenv("WEBHOOK_KEY", "sk-cQzPJUpymdgI4FDsoiGPkboMUoIE3K3pryUt5xa7zyc")
+
+    requests.post(
+        APPROVAL_WEBHOOK,
+        headers={"Content-Type": "application/json", "x-api-key": WEBHOOK_KEY},
+        json={"client_name": client_name, "client_email": client_email, "submission_id": submission_id},
+        timeout=30
+    )
+
+    return f"""
+    <html><body style="font-family:Arial;text-align:center;padding:50px;background:#f0fdf4;">
+      <div style="background:white;border-radius:16px;padding:40px;max-width:400px;
+                  margin:auto;box-shadow:0 10px 40px rgba(0,0,0,0.1);">
+        <h2 style="color:#16a34a;">✅ Booking Approved!</h2>
+        <p>Documents being sent to <b>{client_name}</b></p>
+        <p style="color:#6b7280;font-size:14px;">{client_email}</p>
+        <p style="color:#9ca3af;font-size:12px;margin-top:16px;">
+          Agent will send documents to client shortly.
+        </p>
+      </div>
+    </body></html>
+    """
