@@ -1,13 +1,15 @@
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
-from fastapi.responses import HTMLResponse, FileResponse
 import requests
 import os
 
 app = FastAPI()
 
 LANGFLOW_WEBHOOK = "https://agent-builder.nhtech.link/api/v1/webhook/fcf98cc6-6a0d-4ea4-b18d-7bcf6a100dd1"
-WEBHOOK_KEY = os.getenv("WEBHOOK_KEY", "sk-cQzPJUpymdgI4FDsoiGPkboMUoIE3K3pryUt5xa7zyc")
+WEBHOOK_KEY = os.getenv("WEBHOOK_KEY", "sk-DUAimQsir-R-99iRuOJ_Qo3yk1Qa7xhbX47wyIWpg-E")
+
+APPROVE_WEBHOOK_URL = "https://agent-builder.nhtech.link/api/v1/webhook/a2085853-72dd-410e-bc12-f8580040f114"
+
 
 @app.get("/")
 def home():
@@ -15,6 +17,7 @@ def home():
         "status": "running",
         "message": "DreamHomes API Working"
     }
+
 
 @app.get("/payment-done", response_class=HTMLResponse)
 def payment_done(installment_id: str):
@@ -39,7 +42,7 @@ def payment_done(installment_id: str):
           <p style="color:#6b7280;margin:16px 0;">Your payment has been successfully recorded.</p>
           <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:16px;text-align:left;margin:20px 0;">
             <p style="font-size:14px;">Installment ID: <strong>{installment_id}</strong></p>
-            <p style="font-size:14px;margin-top:8px;">Status: 
+            <p style="font-size:14px;margin-top:8px;">Status:
               <span style="background:#dcfce7;color:#16a34a;padding:4px 16px;border-radius:20px;font-weight:700;">✅ PAID</span>
             </p>
           </div>
@@ -53,51 +56,86 @@ def payment_done(installment_id: str):
     </html>
     """
 
-@app.get("/approve-booking", response_class=HTMLResponse)
-def approve_booking(client_name: str, client_email: str, submission_id: str = ""):
-    
-    # ← YAHAN Agent 2 ka webhook URL daalo
-    APPROVAL_WEBHOOK = "https://agent-builder.nhtech.link/api/v1/webhook/78b52af3-f506-49cd-9d5e-cfb34742a7e7"
-    WEBHOOK_KEY = os.getenv("WEBHOOK_KEY", "sk-cQzPJUpymdgI4FDsoiGPkboMUoIE3K3pryUt5xa7zyc")
 
+@app.get("/approve-booking", response_class=HTMLResponse)
+def approve_booking(
+    client_name: str,
+    client_email: str,
+    submission_id: str = "",
+    stage: str = "manager"
+):
     requests.post(
-        APPROVAL_WEBHOOK,
+        APPROVE_WEBHOOK_URL,
         headers={
             "Content-Type": "application/json",
             "x-api-key": WEBHOOK_KEY
         },
-        # ← YAHAN client_name, email, id bhejo
         json={
             "client_name": client_name,
             "client_email": client_email,
-            "submission_id": submission_id
+            "submission_id": submission_id,
+            "stage": stage          # "manager" → Sales Manager | "cr" → Client Relations
         },
         timeout=30
     )
 
+    if stage == "manager":
+        title = "✅ Sales Manager Approval Completed"
+        message = "Request has been forwarded to the Client Relations (CR) team for final validation."
+        next_step = "CR team will review, convert documents to PDF, and send consolidated email to client."
+    else:
+        title = "✅ CR Team — Final Approval Completed"
+        message = "Documents are being converted to PDF and a consolidated email is being prepared."
+        next_step = "Client will receive all finalized documents via Gmail shortly."
+
     return f"""
-    <html><body style="font-family:Arial;text-align:center;padding:50px;background:#f0fdf4;">
-      <div style="background:white;border-radius:16px;padding:40px;max-width:400px;
-                  margin:auto;box-shadow:0 10px 40px rgba(0,0,0,0.1);">
-        <h2 style="color:#16a34a;">✅ Booking Approved!</h2>
-        <p>Documents being sent to <b>{client_name}</b></p>
-        <p style="color:#6b7280;font-size:14px;">{client_email}</p>
-        <p style="color:#9ca3af;font-size:12px;margin-top:16px;">
-          Agent will send documents to client shortly.
-        </p>
+    <html>
+    <body style="
+        font-family:Arial;
+        background:#f0fdf4;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        min-height:100vh;
+        margin:0;
+    ">
+      <div style="
+          background:white;
+          border-radius:16px;
+          padding:40px;
+          max-width:520px;
+          width:100%;
+          text-align:center;
+          box-shadow:0 10px 40px rgba(0,0,0,0.1);
+      ">
+        <h1 style="color:#16a34a;margin-bottom:4px;">🏠 DreamHomes</h1>
+        <p style="color:#9ca3af;font-size:13px;margin-top:0;">Approval Portal</p>
+
+        <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0;">
+
+        <h2 style="color:#16a34a;">{title}</h2>
+
+        <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;
+                    padding:16px;text-align:left;margin:20px 0;font-size:14px;">
+          <p style="margin:0 0 8px;">👤 Client: <strong>{client_name}</strong></p>
+          <p style="margin:0 0 8px;">📧 Email: <strong>{client_email}</strong></p>
+          <p style="margin:0 0 8px;">🆔 Submission ID: <strong>{submission_id if submission_id else "N/A"}</strong></p>
+          <p style="margin:0;">📌 Stage: 
+            <span style="background:#dcfce7;color:#16a34a;padding:3px 12px;
+                         border-radius:20px;font-weight:700;">
+              {"Sales Manager" if stage == "manager" else "Client Relations (CR)"}
+            </span>
+          </p>
+        </div>
+
+        <p style="color:#374151;margin:16px 0;">{message}</p>
+
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;
+                    padding:14px;font-size:13px;color:#1d4ed8;margin-top:16px;">
+          ℹ️ {next_step}
+        </div>
+
       </div>
-    </body></html>
+    </body>
+    </html>
     """
-
-
-@app.get("/booking-form.html")
-def booking():
-    return FileResponse("booking-form.html")
-
-@app.get("/welcome-docs.html")
-def welcome():
-    return FileResponse("welcome-docs.html")
-
-@app.get("/agreement-to-sell.html")
-def agreement():
-    return FileResponse("agreement-to-sell.html")
