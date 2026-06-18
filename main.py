@@ -59,58 +59,51 @@ def payment_done(installment_id: str):
 
 @app.get("/approve-booking", response_class=HTMLResponse)
 def approve_booking(
-    client_name: str,
-    client_email: str,
+    client_name: str = "N/A",
+    client_email: str = "N/A",
     submission_id: str = "",
     stage: str = "manager"
 ):
+    # CR Team ke liye next approval URL
+    cr_approval_url = (
+        f"https://dreamhomes-payment-api.onrender.com/approve-booking"
+        f"?client_name={client_name}"
+        f"&client_email={client_email}"
+        f"&submission_id={submission_id}"
+        f"&stage=cr"
+    )
+
     requests.post(
         APPROVE_WEBHOOK_URL,
-        headers={
-            "Content-Type": "application/json",
-            "x-api-key": WEBHOOK_KEY
-        },
+        headers={"Content-Type": "application/json", "x-api-key": WEBHOOK_KEY},
         json={
             "client_name": client_name,
             "client_email": client_email,
             "submission_id": submission_id,
-            "stage": stage          # "manager" → Sales Manager | "cr" → Client Relations
+            "stage": stage,
+            "cr_approval_url": cr_approval_url  # ✅ Webhook ko CR link bhi milega
         },
         timeout=30
     )
 
     if stage == "manager":
         title = "✅ Sales Manager Approval Completed"
-        message = "Request has been forwarded to the Client Relations (CR) team for final validation."
-        next_step = "CR team will review, convert documents to PDF, and send consolidated email to client."
+        message = "Request forwarded to Client Relations (CR) team for final validation."
+        next_step = f"CR team ko yeh link bhejo: <a href='{cr_approval_url}'>{cr_approval_url}</a>"
     else:
         title = "✅ CR Team — Final Approval Completed"
-        message = "Documents are being converted to PDF and a consolidated email is being prepared."
-        next_step = "Client will receive all finalized documents via Gmail shortly."
+        message = "Documents PDF mein convert ho rahe hain. Client ko email bheja ja raha hai."
+        next_step = "Client ko Gmail se saare documents mil jayenge."
 
     return f"""
     <html>
-    <body style="
-        font-family:Arial;
-        background:#f0fdf4;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        min-height:100vh;
-        margin:0;
-    ">
-      <div style="
-          background:white;
-          border-radius:16px;
-          padding:40px;
-          max-width:520px;
-          width:100%;
-          text-align:center;
-          box-shadow:0 10px 40px rgba(0,0,0,0.1);
-      ">
+    <body style="font-family:Arial;background:#f0fdf4;display:flex;justify-content:center;
+                 align-items:center;min-height:100vh;margin:0;">
+      <div style="background:white;border-radius:16px;padding:40px;max-width:520px;width:100%;
+                  text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.1);">
+
         <h1 style="color:#16a34a;margin-bottom:4px;">🏠 DreamHomes</h1>
         <p style="color:#9ca3af;font-size:13px;margin-top:0;">Approval Portal</p>
-
         <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0;">
 
         <h2 style="color:#16a34a;">{title}</h2>
@@ -120,9 +113,8 @@ def approve_booking(
           <p style="margin:0 0 8px;">👤 Client: <strong>{client_name}</strong></p>
           <p style="margin:0 0 8px;">📧 Email: <strong>{client_email}</strong></p>
           <p style="margin:0 0 8px;">🆔 Submission ID: <strong>{submission_id if submission_id else "N/A"}</strong></p>
-          <p style="margin:0;">📌 Stage: 
-            <span style="background:#dcfce7;color:#16a34a;padding:3px 12px;
-                         border-radius:20px;font-weight:700;">
+          <p style="margin:0;">📌 Stage:
+            <span style="background:#dcfce7;color:#16a34a;padding:3px 12px;border-radius:20px;font-weight:700;">
               {"Sales Manager" if stage == "manager" else "Client Relations (CR)"}
             </span>
           </p>
