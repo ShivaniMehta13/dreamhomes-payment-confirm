@@ -64,7 +64,6 @@ def approve_booking(
     submission_id: str = "",
     stage: str = "manager"
 ):
-    # CR Team ke liye next approval URL
     cr_approval_url = (
         f"https://dreamhomes-payment-api.onrender.com/approve-booking"
         f"?client_name={client_name}"
@@ -81,19 +80,17 @@ def approve_booking(
             "client_email": client_email,
             "submission_id": submission_id,
             "stage": stage,
-            "cr_approval_url": cr_approval_url  # ✅ Webhook ko CR link bhi milega
+            "cr_approval_url": cr_approval_url
         },
         timeout=30
     )
 
     if stage == "manager":
         title = "✅ Sales Manager Approval Completed"
-        message = "Request forwarded to Client Relations (CR) team for final validation."
-        next_step = f"CR team ko yeh link bhejo: <a href='{cr_approval_url}'>{cr_approval_url}</a>"
+        message = "This booking has been approved and forwarded to the Client Relations team for final validation."
     else:
-        title = "✅ CR Team — Final Approval Completed"
-        message = "Documents PDF mein convert ho rahe hain. Client ko email bheja ja raha hai."
-        next_step = "Client ko Gmail se saare documents mil jayenge."
+        title = "✅ Final Approval Completed"
+        message = "All documents are being prepared and the client will receive a confirmation email shortly."
 
     return f"""
     <html>
@@ -121,11 +118,6 @@ def approve_booking(
         </div>
 
         <p style="color:#374151;margin:16px 0;">{message}</p>
-
-        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;
-                    padding:14px;font-size:13px;color:#1d4ed8;margin-top:16px;">
-          ℹ️ {next_step}
-        </div>
 
       </div>
     </body>
