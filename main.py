@@ -25,12 +25,18 @@ def home():
 
 @app.get("/payment-done", response_class=HTMLResponse)
 def payment_done(installment_id: str):
-    requests.post(
-        LANGFLOW_WEBHOOK,
-        headers={"Content-Type": "application/json", "x-api-key": WEBHOOK_KEY},
-        json={"installment_id": installment_id},
-        timeout=30
-    )
+    try:
+        resp = requests.post(
+            LANGFLOW_WEBHOOK,
+            headers={"Content-Type": "application/json", "x-api-key": WEBHOOK_KEY},
+            json={"installment_id": installment_id},
+            timeout=30
+        )
+        print("PAYMENT WEBHOOK STATUS:", resp.status_code)
+        print("PAYMENT WEBHOOK RESPONSE:", resp.text)
+    except Exception as e:
+        print("PAYMENT WEBHOOK ERROR:", str(e))
+
     return f"""
     <html>
     <body style="font-family:Arial;background:#f0fdf4;display:flex;align-items:center;
