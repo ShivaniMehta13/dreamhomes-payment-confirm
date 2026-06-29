@@ -6,7 +6,7 @@ import os
 app = FastAPI()
 
 LANGFLOW_WEBHOOK = "https://agent-builder.nhtech.link/api/v1/webhook/fcf98cc6-6a0d-4ea4-b18d-7bcf6a100dd1"
-WEBHOOK_KEY = os.getenv("WEBHOOK_KEY", "sk-cQzPJUpymdgI4FDsoiGPkboMUoIE3K3pryUt5xa7zyc")
+WEBHOOK_KEY = os.getenv("WEBHOOK_KEY", "sk-DUAimQsir-R-99iRuOJ_Qo3yk1Qa7xhbX47wyIWpg-E")
 
 # Webhook 1 — Sales Manager approve kare → CR ko mail
 MANAGER_APPROVE_WEBHOOK = "https://agent-builder.nhtech.link/api/v1/webhook/a2085853-72dd-410e-bc12-f8580040f114"
